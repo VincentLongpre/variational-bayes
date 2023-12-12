@@ -66,4 +66,4 @@ class DiagonalGaussian:
         Returns:
             torch.Tensor: KL-Divergence for each element in the batch (size: batch size).
         """
-        return kl_divergence(self.dist, standard_normal)
+        return kl_divergence(self.dist, self.standard_normal)
