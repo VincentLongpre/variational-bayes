@@ -17,6 +17,21 @@ Final project, IFT 6269 : Probabilistic Graphical Models - Fall 2023, Prof. [Sim
 
 ## Datasets 📊
 
+## Code 🖥️
+
+Project structure (directories):
+```
+.
+└── variational-bayes
+    ├── VariNet
+    │   ├── models
+    │   ├── plots
+    │   └── utils
+    ├── data
+    ├── figures
+    └── notebooks
+```
+
 ## Experiments & Results 📈
 
 ## Conclusions 📝
