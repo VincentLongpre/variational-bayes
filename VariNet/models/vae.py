@@ -71,11 +71,8 @@ class VAE(nn.Module):
       x
     Returns:
       reconstruction: The mode of the distribution p_\theta(x | z) as a candidate reconstruction
-                      Size: (batch_size, 3, 32, 32)
       Conditional Negative Log-Likelihood: The negative log-likelihood of the input x under the distribution p_\theta(x | z)
-                                            Size: (batch_size,)
       KL: The KL Divergence between the variational approximate posterior with N(0, I)
-          Size: (batch_size,)
     """
     posterior = self.encode(x)
     latent_z = posterior.sample()
@@ -170,13 +167,17 @@ class Decoder(nn.Module):
   def __init__(self, n_channels, n_filters, n_z, size):
     super(Decoder, self).__init__()
     self.n_filters = n_filters
-    self.out_size = size // 4
+    self.out_size = size // 16
     self.decoder_dense = nn.Sequential(
-      nn.Linear(n_z, n_filters * 4 * self.out_size * self.out_size),
+      nn.Linear(n_z, n_filters * 8 * self.out_size * self.out_size),
       nn.ReLU(True)
     )
 
     self.decoder_conv = nn.Sequential(
+      nn.UpsamplingNearest2d(scale_factor=2),
+      nn.Conv2d(n_filters * 8, n_filters * 4, 3, 1, padding=1),
+      nn.LeakyReLU(0.2, True),
+
       nn.UpsamplingNearest2d(scale_factor=2),
       nn.Conv2d(n_filters * 4, n_filters * 2, 3, 1, padding=1),
       nn.LeakyReLU(0.2, True),
@@ -186,12 +187,12 @@ class Decoder(nn.Module):
       nn.LeakyReLU(0.2, True),
 
       nn.UpsamplingNearest2d(scale_factor=2),
-      nn.Conv2d(n_filters, n_channels, 3, 2, padding=1)
+      nn.Conv2d(n_filters, n_channels, 3, 1, padding=1)
     )
 
   def forward(self, input):
     batch_size = input.size(0)
-    hidden = self.decoder_dense(input).view(batch_size, self.n_filters * 4,
+    hidden = self.decoder_dense(input).view(batch_size, self.n_filters * 8,
                                             self.out_size, self.out_size)
     output = self.decoder_conv(hidden)
     return output
