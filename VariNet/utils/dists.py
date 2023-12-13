@@ -27,7 +27,7 @@ class DiagonalGaussian:
 
         shape = mean.reshape(self.mean.shape[0], -1).shape
         self.dist = MultivariateNormal(mean.reshape(shape), torch.diag_embed(self.var.reshape(shape)))
-        self.standard_normal = MultivariateNormal(torch.zeros(shape), torch.eye(shape[1]))
+        self.standard_normal = MultivariateNormal(torch.zeros(shape).to(self.device), torch.eye(shape[1]).to(self.device))
 
     def mode(self):
         """
