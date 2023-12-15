@@ -57,6 +57,10 @@ def train_vae_MNIST(batch_size = 64,
     for epoch in range(epochs):
         epoch_loss = 0
         epoch_recon_error = 0
+        loss = 100
+        if loss > 3000 or loss <0:
+            print('Loss too high, stopping training')
+            break
         with tqdm(train_dataloader, unit="batch", leave=False) as tepoch:
             vae.train()
             nb_batches = len(tepoch)
@@ -71,6 +75,10 @@ def train_vae_MNIST(batch_size = 64,
 
                 recon, nll, kl = vae(x)
                 loss = (nll + kl).mean()
+                if loss > 3000 or loss <0:
+                    print('Loss too high, stopping training')
+                    break
+
                 epoch_loss += loss
                 epoch_recon_error += mse_loss(recon, x)
 
@@ -231,6 +239,10 @@ def train_avae_MNIST(batch_size = 64,
     for epoch in range(epochs):
         epoch_loss = 0
         epoch_recon_error = 0
+        primal_loss = 100
+        if primal_loss > 3000 or primal_loss <0:
+            print('Loss too high, stopping training')
+            break
         with tqdm(train_dataloader, unit="batch", leave=False) as tepoch:
             avae.train()
             nb_batches = len(tepoch)
@@ -256,6 +268,10 @@ def train_avae_MNIST(batch_size = 64,
                 primal_loss = (nll+kl).mean()
                 epoch_loss += primal_loss
                 epoch_recon_error += mse_loss(recon, x)
+
+                if primal_loss > 3000 or primal_loss <0:
+                    print('Loss too high, stopping training')
+                    break
 
                 primal_loss.backward()
                 avae_primal_optimizer.step()
