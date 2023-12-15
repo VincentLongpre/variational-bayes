@@ -13,7 +13,7 @@ class AVAE(nn.Module):
     self.adversary = adversary
     self.encoder = encoder
     self.decoder = decoder
-    
+
   def encode(self, x):
     """
     Returns samples from the posterior distribution q_\phi(z | x) along with the mean and variance
@@ -26,7 +26,7 @@ class AVAE(nn.Module):
     """
     mean = self.decoder(z)
     conditional = DiagonalGaussian(mean,device=self.device)
-    return conditional 
+    return conditional
 
   def sample(self, batch_size):
     """
@@ -121,7 +121,7 @@ class Encoder(nn.Module):
   """
   Encoder network for MnistAVAE
   """
-  def __init__(self, n_channels, n_filters, n_z, device, eps_basis = 16, eps_dim = 32):
+  def __init__(self, n_channels, n_filters, n_z, device, eps_basis = 16, eps_dim = 32, size=32):
     super(Encoder, self).__init__()
 
     self.eps_basis = eps_basis
@@ -129,6 +129,9 @@ class Encoder(nn.Module):
 
     # Device
     self.device = device
+
+    # Output size
+    out_size = size // 16
 
     # Encoder: (nc, isize, isize) -> (nef*8, isize//16, isize//16)
     self.encoder = nn.Sequential(
@@ -150,12 +153,12 @@ class Encoder(nn.Module):
     )
 
     self.z0_projector = nn.Sequential(
-      nn.Linear(n_filters * 8, n_z),
+      nn.Linear(n_filters * 8 * out_size * out_size, n_z),
       nn.LeakyReLU(0.2, True)
     )
-  
+
     self.a_projector = nn.Sequential(
-      nn.Linear(n_filters * 8, n_z),
+      nn.Linear(n_filters * 8 * out_size * out_size, n_z),
       nn.LeakyReLU(0.2, True)
     )
 
@@ -180,7 +183,7 @@ class Encoder(nn.Module):
     a = self.a_projector(net)
     z0 = self.z0_projector(net)
 
-    v_all = self.v_network(eps)  
+    v_all = self.v_network(eps)
 
     v_sum = torch.sum(v_all, dim=0)
 
@@ -345,14 +348,16 @@ class MnistAVAE(AVAE):
   """
   def __init__(self, in_channels=3, decoder_features=32, encoder_features=32,
                z_dim=100, input_size=32, device=torch.device("cuda:0")):
-    super(MnistAVAE, self).__init__(adversary=Adversary(size=input_size,
+    super(MnistAVAE, self).__init__(z_dim = z_dim,
+                                    adversary=Adversary(size=input_size,
                                                         nz=z_dim),
                                     encoder=Encoder(n_channels=in_channels,
                                                     n_filters=encoder_features,
                                                     n_z=z_dim,
-                                                    device=device
+                                                    device=device,
+                                                    size=input_size
                                                     ),
-                                    decoder=Decoder(n_channels=in_channels, 
+                                    decoder=Decoder(n_channels=in_channels,
                                                     n_filters=decoder_features,
                                                     n_z=z_dim,
                                                     size=input_size
@@ -365,7 +370,7 @@ class MnistAVAE(AVAE):
     prior = DiagonalGaussian(torch.zeros(x.shape[0],latent_z.shape[1]).to(self.device), device=self.device)
     posterior = DiagonalGaussian(z_mean, z_var, device=self.device)
 
-    sampled_z = prior.sample() 
+    sampled_z = prior.sample()
 
     recon = self.decode(latent_z)
 
