@@ -5,15 +5,15 @@ from torchvision import datasets
 from torchvision import transforms
 from torch.utils.data import DataLoader, IterableDataset
 
-def mnist_dataloaders(data_root, batch_size, image_size=32):
+def mnist_dataloaders(data_root, batch_size, image_size=32, download=True):
     normalize = transforms.Normalize((0.5,), (0.5,))
     transform = transforms.Compose((
         transforms.Resize((image_size, image_size)),
         transforms.ToTensor(),
         ThresholdTransform(thr_255=127)))
 
-    train = datasets.MNIST(data_root, train=True, download=True, transform=transform)
-    test = datasets.MNIST(data_root, train=False, download=True, transform=transform)
+    train = datasets.MNIST(data_root, train=True, download=download, transform=transform)
+    test = datasets.MNIST(data_root, train=False, download=download, transform=transform)
 
     train_dataloader = torch.utils.data.DataLoader(train, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dataloader = torch.utils.data.DataLoader(test, batch_size=batch_size)
@@ -27,15 +27,15 @@ class ThresholdTransform(object):
   def __call__(self, x):
     return (x > self.thr).to(x.dtype)
 
-def binary_mnist_dataloaders(data_root, batch_size, image_size=32):
+def binary_mnist_dataloaders(data_root, batch_size, image_size=32, download=True):
     normalize = transforms.Normalize((0.5,), (0.5,))
     transform = transforms.Compose((
         transforms.Resize((image_size, image_size)),
         transforms.ToTensor(),
         normalize))
 
-    train = datasets.MNIST(data_root, train=True, download=True, transform=transform)
-    test = datasets.MNIST(data_root, train=False, download=True, transform=transform)
+    train = datasets.MNIST(data_root, train=True, download=download, transform=transform)
+    test = datasets.MNIST(data_root, train=False, download=download, transform=transform)
 
     train_dataloader = torch.utils.data.DataLoader(train, batch_size=batch_size, shuffle=True, drop_last=True)
     test_dataloader = torch.utils.data.DataLoader(test, batch_size=batch_size)

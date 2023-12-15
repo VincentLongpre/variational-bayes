@@ -20,7 +20,8 @@ def train_vae_MNIST(batch_size = 64,
                 results_folder = "./results",
                 binary = False,
                 decoder_features = 32,
-                encoder_features = 32):
+                encoder_features = 32,
+                download = True):
 
     # Training setup
     data_root = './data'
@@ -44,9 +45,9 @@ def train_vae_MNIST(batch_size = 64,
 
     # Get MNIST dataloaders (binary or not)
     if binary:
-        train_dataloader, _ = binary_mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size)
+        train_dataloader, _ = binary_mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size, download=download)
     else:
-        train_dataloader, _ = mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size)
+        train_dataloader, _ = mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size, download=download)
 
     # Training loop
     train_losses = []
@@ -173,7 +174,8 @@ def train_avae_MNIST(batch_size = 64,
                 results_folder = "./results",
                 binary = False,
                 decoder_features = 32,
-                encoder_features = 32):
+                encoder_features = 32,
+                download = True):
 
     # Training setup
     data_root = './data'
@@ -198,9 +200,9 @@ def train_avae_MNIST(batch_size = 64,
 
     # Get MNIST dataloaders (binary or not)
     if binary:
-        train_dataloader, _ = binary_mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size)
+        train_dataloader, _ = binary_mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size, download=download)
     else:
-        train_dataloader, _ = mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size)
+        train_dataloader, _ = mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size, download=download)
 
     # Function to zero out gradients
     def zero_grad():
