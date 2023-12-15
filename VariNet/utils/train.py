@@ -106,6 +106,10 @@ def train_vae_MNIST(batch_size = 64,
     # Save model state dict
     torch.save(vae.state_dict(), results_folder / 'model.pth')
 
+    # Clean gpu
+    del vae
+    torch.cuda.empty_cache()
+
 def train_vae_toy(batch_size = 512,
                 lr = 1e-4,
                 results_folder = "./results",
@@ -163,6 +167,10 @@ def train_vae_toy(batch_size = 512,
     # Create and save scatter plot
     fig = create_scatter_toy(vae, device, model_type='VAE')
     fig.savefig(images_folder / 'scatter.png')
+
+    # Clean gpu
+    del vae
+    torch.cuda.empty_cache()
 
 def train_avae_MNIST(batch_size = 64,
                 z_dim = 32,
@@ -275,6 +283,10 @@ def train_avae_MNIST(batch_size = 64,
     # Save model state dict
     torch.save(avae.state_dict(), results_folder / 'model.pth')
 
+    # Clean gpu
+    del avae
+    torch.cuda.empty_cache()
+
 def train_avae_toy(batch_size = 512,
                 primal_lr = 1e-4,
                 adv_lr = 1e-4,
@@ -349,3 +361,7 @@ def train_avae_toy(batch_size = 512,
     # Create and save scatter plot
     fig = create_scatter_toy(avae, device, model_type='AVAE')
     fig.savefig(images_folder / 'scatter.png')
+
+    # Clean gpu
+    del avae
+    torch.cuda.empty_cache()
