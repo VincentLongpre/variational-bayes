@@ -1,5 +1,7 @@
 import torch
 from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+import torch.nn.functional as F
 
 def visualize_latent_space(model, dataloader):
     """
@@ -31,3 +33,20 @@ def visualize_latent_space(model, dataloader):
     plt.scatter(tsne_representations[:, 0], tsne_representations[:, 1], c=labels, cmap='tab10')
     plt.colorbar()
     plt.show()
+
+def create_scatter_toy(model, device, batch_size=1000):
+
+    # Create figure to return
+    fig = plt.figure(figsize=(8,8))
+
+    for label in range(4):
+        images = F.one_hot(torch.tensor([label]), 4).float().repeat(batch_size, 1)
+        posterior = model.encode(images.to(device))
+
+        latent_z = posterior.sample().detach().to('cpu')
+        plt.scatter(latent_z[:, 0], latent_z[:, 1],  edgecolor='none', alpha=0.5, label=f"Class {label}")
+
+    plt.xlim(-3, 3); plt.ylim(-3.5, 3.5)
+    plt.legend()
+
+    return fig
