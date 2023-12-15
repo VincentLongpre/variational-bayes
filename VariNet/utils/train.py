@@ -11,6 +11,8 @@ from tqdm.auto import tqdm
 from pathlib import Path
 import json
 
+data_root = './data'
+
 def train_vae_MNIST(batch_size = 64,
                 z_dim = 32,
                 lr = 1e-3,
@@ -24,7 +26,6 @@ def train_vae_MNIST(batch_size = 64,
                 download = True):
 
     # Training setup
-    data_root = './data'
     results_folder = Path(results_folder)
     results_folder.mkdir(parents=True, exist_ok = True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -186,7 +187,6 @@ def train_avae_MNIST(batch_size = 64,
                 download = True):
 
     # Training setup
-    data_root = './data'
     results_folder = Path(results_folder)
     results_folder.mkdir(parents=True, exist_ok = True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
