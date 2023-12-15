@@ -53,8 +53,10 @@ def train_vae_MNIST(batch_size = 64,
 
     # Training loop
     train_losses = []
+    recon_error = []
     for epoch in range(epochs):
         epoch_loss = 0
+        epoch_recon_error = 0
         with tqdm(train_dataloader, unit="batch", leave=False) as tepoch:
             vae.train()
             nb_batches = len(tepoch)
@@ -70,6 +72,7 @@ def train_vae_MNIST(batch_size = 64,
                 recon, nll, kl = vae(x)
                 loss = (nll + kl).mean()
                 epoch_loss += loss
+                epoch_recon_error += mse_loss(recon, x)
 
                 loss.backward()
                 optimizer.step()
@@ -77,8 +80,10 @@ def train_vae_MNIST(batch_size = 64,
                 tepoch.set_postfix(loss=loss.item())
 
         epoch_loss /= nb_batches
+        epoch_recon_error = epoch_recon_error / nb_batches
         print(f'Epoch {epoch} Mean Loss: {epoch_loss}')
         train_losses.append(epoch_loss)
+        recon_error.append(epoch_recon_error)
 
         # Save image samples to results folder (from params)
         samples = vae.sample(batch_size=64)
@@ -86,6 +91,7 @@ def train_vae_MNIST(batch_size = 64,
 
     # Train losses to list of floats
     train_losses = [float(loss) for loss in train_losses]
+    recon_error = [float(loss) for loss in recon_error]
 
     # Create dictionary with training parameters
     params = {'model_type': 'VAE',
@@ -99,6 +105,7 @@ def train_vae_MNIST(batch_size = 64,
               'decoder_features': decoder_features,
               'encoder_features': encoder_features,
               'train_losses': train_losses,
+              'recon_error': recon_error,
               'dataset': 'MNIST'}
 
     # Save training parameters to results folder
@@ -223,6 +230,7 @@ def train_avae_MNIST(batch_size = 64,
     recon_error = []
     for epoch in range(epochs):
         epoch_loss = 0
+        epoch_recon_error = 0
         with tqdm(train_dataloader, unit="batch", leave=False) as tepoch:
             avae.train()
             nb_batches = len(tepoch)
@@ -266,6 +274,7 @@ def train_avae_MNIST(batch_size = 64,
 
     # Train losses to list of floats
     train_losses = [float(loss) for loss in train_losses]
+    recon_error = [float(loss) for loss in recon_error]
 
     # Create dictionary with training parameters
     params = {'model_type': 'AVAE',
@@ -279,7 +288,8 @@ def train_avae_MNIST(batch_size = 64,
               'binary': binary,
               'decoder_features': decoder_features,
               'encoder_features': encoder_features,
-              'train_losses': train_losses}
+              'train_losses': train_losses,
+              'recon_error': recon_error}
 
     # Save training parameters to results folder
     with open(results_folder / 'params.json', 'w') as f:
