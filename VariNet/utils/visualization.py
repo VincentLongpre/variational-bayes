@@ -34,16 +34,22 @@ def visualize_latent_space(model, dataloader):
     plt.colorbar()
     plt.show()
 
-def create_scatter_toy(model, device, batch_size=1000):
+def create_scatter_toy(model, device, batch_size=1000, model_type='VAE'):
 
     # Create figure to return
     fig = plt.figure(figsize=(8,8))
 
     for label in range(4):
         images = F.one_hot(torch.tensor([label]), 4).float().repeat(batch_size, 1)
-        posterior = model.encode(images.to(device))
 
-        latent_z = posterior.sample().detach().to('cpu')
+        if model_type == 'VAE':
+            posterior = model.encode(images.to(device))
+            latent_z = posterior.sample()
+
+        elif model_type == 'AVAE':
+            latent_z = model.encode(images.to(device))
+
+        latent_z = latent_z.detach().to('cpu')
         plt.scatter(latent_z[:, 0], latent_z[:, 1],  edgecolor='none', alpha=0.5, label=f"Class {label}")
 
     plt.xlim(-3, 3); plt.ylim(-3.5, 3.5)
