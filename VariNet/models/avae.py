@@ -108,6 +108,15 @@ class ToyEncoder(nn.Module):
       nn.Linear(64, n_z)
     )
 
+  def forward(self, inputs):
+    batch_size = inputs.size(0)
+    eps = torch.randn((batch_size, 64)).to(self.device)
+
+    inputs = torch.concat([inputs.view(batch_size, -1),eps], dim=1)
+    output = self.encoder(inputs)
+
+    return output
+
 class Encoder(nn.Module):
   """
   Encoder network for MnistAVAE
@@ -308,12 +317,12 @@ class ToyAVAE(AVAE):
   AVAE for the toy dataset
   """
   def __init__(self, z_dim=100, input_size=32, device=torch.device("cuda:0")):
-    super(ToyAVAE, self).__init__(feature_size=64,
-                                  adversary=ToyAdversary(size=input_size,
-                                                         nz=z_dim,
+    super(ToyAVAE, self).__init__(adversary=ToyAdversary(size=input_size,
+                                                         n_z=z_dim,
                                                          device=device),
                                   encoder=ToyEncoder(size=input_size,
-                                                     device=device),
+                                                     device=device,
+                                                     n_z=z_dim),
                                   decoder=ToyDecoder(n_z=z_dim),
                                   z_dim=z_dim,
                                   device=device
