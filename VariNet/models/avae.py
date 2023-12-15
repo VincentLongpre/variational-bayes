@@ -32,7 +32,7 @@ class AVAE(nn.Module):
     """
     Returns samples generated samples using the decoder
     """
-    z = torch.randn((batch_size,self.z_dim))
+    z = torch.randn((batch_size,self.z_dim)).to(self.device)
     conditional = self.decode(z)
     mode = conditional.mode()
     return mode
@@ -121,7 +121,7 @@ class Encoder(nn.Module):
   """
   Encoder network for MnistAVAE
   """
-  def __init__(self, nc, nef, nz, isize, device, eps_basis = 16, eps_dim = 32):
+  def __init__(self, n_channels, n_filters, n_z, device, eps_basis = 16, eps_dim = 32):
     super(Encoder, self).__init__()
 
     self.eps_basis = eps_basis
@@ -132,30 +132,30 @@ class Encoder(nn.Module):
 
     # Encoder: (nc, isize, isize) -> (nef*8, isize//16, isize//16)
     self.encoder = nn.Sequential(
-      nn.Conv2d(nc, nef, 4, 2, padding=1),
+      nn.Conv2d(n_channels, n_filters, 4, 2, padding=1),
       nn.LeakyReLU(0.2, True),
-      nn.BatchNorm2d(nef),
+      nn.BatchNorm2d(n_filters),
 
-      nn.Conv2d(nef, nef * 2, 4, 2, padding=1),
+      nn.Conv2d(n_filters, n_filters * 2, 4, 2, padding=1),
       nn.LeakyReLU(0.2, True),
-      nn.BatchNorm2d(nef * 2),
+      nn.BatchNorm2d(n_filters * 2),
 
-      nn.Conv2d(nef * 2, nef * 4, 4, 2, padding=1),
+      nn.Conv2d(n_filters * 2, n_filters * 4, 4, 2, padding=1),
       nn.LeakyReLU(0.2, True),
-      nn.BatchNorm2d(nef * 4),
+      nn.BatchNorm2d(n_filters * 4),
 
-      nn.Conv2d(nef * 4, nef * 8, 4, 2, padding=1),
+      nn.Conv2d(n_filters * 4, n_filters * 8, 4, 2, padding=1),
       nn.LeakyReLU(0.2, True),
-      nn.BatchNorm2d(nef * 8)
+      nn.BatchNorm2d(n_filters * 8)
     )
 
     self.z0_projector = nn.Sequential(
-      nn.Linear(nef * 8, nz),
+      nn.Linear(n_filters * 8, n_z),
       nn.LeakyReLU(0.2, True)
     )
   
     self.a_projector = nn.Sequential(
-      nn.Linear(nef * 8, nz),
+      nn.Linear(n_filters * 8, n_z),
       nn.LeakyReLU(0.2, True)
     )
 
@@ -166,7 +166,7 @@ class Encoder(nn.Module):
       nn.Linear(128, 128),
       nn.LeakyReLU(0.2, True),
 
-      nn.Linear(128, nz),
+      nn.Linear(128, n_z),
       nn.LeakyReLU(0.2, True)
     )
 
@@ -193,12 +193,23 @@ class Encoder(nn.Module):
 
   def forward(self, inputs):
     batch_size = inputs.size(0)
-    eps = torch.randn((batch_size, 64)).to(self.device)
+    eps = torch.randn((self.eps_basis, batch_size, self.eps_dim)).to(self.device)
 
-    inputs = torch.concat([inputs.view(batch_size, -1), eps], dim=1)
-    output = self.encoder(inputs)
+    net = self.encoder(inputs)
+    net = net.view(batch_size,-1)
 
-    return output
+    a = self.a_projector(net)
+    z0 = self.z0_projector(net)
+
+    v_all = self.v_network(eps)
+
+    v_sum = torch.sum(v_all, dim=0)
+
+    z = z0 + v_sum
+    Ez = z0 + a * torch.mean(v_all, dim=0)
+    Varz = a * a * torch.var(v_all, dim=0)
+
+    return z, Ez, Varz
 
 class ToyAdversary(nn.Module):
   """
@@ -239,19 +250,19 @@ class ToyAdversary(nn.Module):
     output = self.out_net(output)
     output = torch.squeeze(output)
     return output
-  
+
 class Adversary(nn.Module):
   """
   Adversary network of the MnistAVAE
   """
-  def __init__(self,isize, nz):
+  def __init__(self,size, nz):
     super(Adversary, self).__init__()
 
-    self.isize = isize
+    self.size = size
     self.nz = nz
 
     self.theta_net = nn.Sequential(
-      nn.Linear(isize * isize, 1024),
+      nn.Linear(size * size, 1024),
       nn.LeakyReLU(0.2, True),
 
       nn.Linear(1024, 1024),
@@ -290,7 +301,7 @@ class Adversary(nn.Module):
     )
 
     self.x_stat = nn.Sequential(
-      nn.Linear(isize * isize, 1024),
+      nn.Linear(size * size, 1024),
       nn.LeakyReLU(0.2, True),
 
       nn.Linear(1024, 1024),
@@ -311,7 +322,7 @@ class Adversary(nn.Module):
 
     output = torch.sum(theta * s, dim=1, keepdim=True) + T_x + T_z
     return output
-  
+
 class ToyAVAE(AVAE):
   """
   AVAE for the toy dataset
@@ -334,15 +345,37 @@ class MnistAVAE(AVAE):
   """
   def __init__(self, in_channels=3, decoder_features=32, encoder_features=32,
                z_dim=100, input_size=32, device=torch.device("cuda:0")):
-    super(MnistAVAE, self).__init__(feature_size=64,
-                                    adversary=Adversary(size=input_size,
-                                                        nz=z_dim,
-                                                        device=device),
-                                    encoder=Encoder(size=input_size,
-                                                    device=device),
-                                    decoder=Decoder(nc=in_channels, 
-                                                    ndf=decoder_features, 
-                                                    nz=z_dim, 
-                                                    isize=input_size
+    super(MnistAVAE, self).__init__(adversary=Adversary(size=input_size,
+                                                        nz=z_dim),
+                                    encoder=Encoder(n_channels=in_channels,
+                                                    n_filters=encoder_features,
+                                                    n_z=z_dim,
+                                                    device=device
+                                                    ),
+                                    decoder=Decoder(n_channels=in_channels, 
+                                                    n_filters=decoder_features,
+                                                    n_z=z_dim,
+                                                    size=input_size
                                                     )
                                       )
+
+  def forward(self, x):
+    latent_z, z_mean, z_var = self.encode(x)
+    z_mean, z_var = z_mean.detach(), z_var.detach()
+    prior = DiagonalGaussian(torch.zeros(x.shape[0],latent_z.shape[1]).to(self.device), device=self.device)
+    posterior = DiagonalGaussian(z_mean, z_var, device=self.device)
+
+    sampled_z = prior.sample() 
+
+    recon = self.decode(latent_z)
+
+    T_d = self.adversary(x, latent_z)
+    T_i = self.adversary(x, sampled_z)
+
+    CE_loss = nn.BCELoss()
+    sigmoid = nn.Sigmoid()
+    adv_loss = CE_loss(sigmoid(T_d), torch.ones_like(T_d)) + CE_loss(sigmoid(T_i), torch.zeros_like(T_i))
+
+    kl = T_d + posterior.nll(latent_z)
+
+    return recon.mode(), recon.nll(x), kl, adv_loss
