@@ -25,7 +25,7 @@ def train_vae_MNIST(batch_size = 64,
     # Training setup
     data_root = './data'
     results_folder = Path(results_folder)
-    results_folder.mkdir(exist_ok = True)
+    results_folder.mkdir(parents=True, exist_ok = True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # Create image directory inside results folder
@@ -112,7 +112,7 @@ def train_vae_toy(batch_size = 512,
 
     # Training setup
     results_folder = Path(results_folder)
-    results_folder.mkdir(exist_ok = True)
+    results_folder.mkdir(parents=True, exist_ok = True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # Create image directory inside results folder
@@ -178,7 +178,7 @@ def train_avae_MNIST(batch_size = 64,
     # Training setup
     data_root = './data'
     results_folder = Path(results_folder)
-    results_folder.mkdir(exist_ok = True)
+    results_folder.mkdir(parents=True, exist_ok = True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # Create image directory inside results folder
@@ -286,7 +286,7 @@ def train_avae_toy(batch_size = 512,
 
     # Create image directory inside results folder
     images_folder = results_folder / 'images'
-    images_folder.mkdir(exist_ok=True)
+    images_folder.mkdir(parents=True, exist_ok=True)
 
     # Create model, and optimizer
     avae = ToyAVAE(input_size=4,
