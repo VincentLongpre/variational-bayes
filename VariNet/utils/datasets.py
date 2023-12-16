@@ -10,7 +10,7 @@ def mnist_dataloaders(data_root, batch_size, image_size=32):
     transform = transforms.Compose((
         transforms.Resize((image_size, image_size)),
         transforms.ToTensor(),
-        ThresholdTransform(thr_255=127)))
+        normalize))
 
     train = datasets.MNIST(data_root, train=True, download=True, transform=transform)
     test = datasets.MNIST(data_root, train=False, download=True, transform=transform)
@@ -28,11 +28,10 @@ class ThresholdTransform(object):
     return (x > self.thr).to(x.dtype)
 
 def binary_mnist_dataloaders(data_root, batch_size, image_size=32):
-    normalize = transforms.Normalize((0.5,), (0.5,))
     transform = transforms.Compose((
         transforms.Resize((image_size, image_size)),
         transforms.ToTensor(),
-        normalize))
+        ThresholdTransform(thr_255=127)))
 
     train = datasets.MNIST(data_root, train=True, download=True, transform=transform)
     test = datasets.MNIST(data_root, train=False, download=True, transform=transform)
