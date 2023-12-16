@@ -5,6 +5,7 @@ from ..utils.visualization import create_scatter_toy
 
 import torch
 from torch.optim import Adam
+from torch.nn.functional import mse_loss
 from torchvision.utils import save_image
 
 from tqdm.auto import tqdm
@@ -219,6 +220,7 @@ def train_avae_MNIST(batch_size = 64,
 
     # Training loop
     train_losses = []
+    recon_error = []
     for epoch in range(epochs):
         epoch_loss = 0
         with tqdm(train_dataloader, unit="batch", leave=False) as tepoch:
@@ -245,6 +247,7 @@ def train_avae_MNIST(batch_size = 64,
                 recon, nll, kl, adv = avae(x)
                 primal_loss = (nll+kl).mean()
                 epoch_loss += primal_loss
+                epoch_recon_error += mse_loss(recon, x)
 
                 primal_loss.backward()
                 avae_primal_optimizer.step()
@@ -252,8 +255,10 @@ def train_avae_MNIST(batch_size = 64,
                 tepoch.set_postfix(loss=primal_loss.item())
 
         epoch_loss /= nb_batches
-        print(f'Epoch {epoch} Mean Loss: {epoch_loss}')
+        epoch_recon_error = epoch_recon_error / nb_batches
+        print(f'Epoch {epoch} Mean Loss: {epoch_loss} Mean Recon Error: {epoch_recon_error}')
         train_losses.append(epoch_loss)
+        recon_error.append(epoch_recon_error)
 
         # Save image samples to results folder (from params)
         samples = avae.sample(batch_size=64)
