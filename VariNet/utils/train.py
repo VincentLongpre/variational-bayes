@@ -11,6 +11,8 @@ from tqdm.auto import tqdm
 from pathlib import Path
 import json
 
+data_root = './data'
+
 def train_vae_MNIST(batch_size = 64,
                 z_dim = 32,
                 lr = 1e-3,
@@ -20,10 +22,10 @@ def train_vae_MNIST(batch_size = 64,
                 results_folder = "./results",
                 binary = False,
                 decoder_features = 32,
-                encoder_features = 32):
+                encoder_features = 32,
+                download = True):
 
     # Training setup
-    data_root = './data'
     results_folder = Path(results_folder)
     results_folder.mkdir(parents=True, exist_ok = True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -44,9 +46,9 @@ def train_vae_MNIST(batch_size = 64,
 
     # Get MNIST dataloaders (binary or not)
     if binary:
-        train_dataloader, _ = binary_mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size)
+        train_dataloader, _ = binary_mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size, download=download)
     else:
-        train_dataloader, _ = mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size)
+        train_dataloader, _ = mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size, download=download)
 
     # Training loop
     train_losses = []
@@ -104,6 +106,10 @@ def train_vae_MNIST(batch_size = 64,
 
     # Save model state dict
     torch.save(vae.state_dict(), results_folder / 'model.pth')
+
+    # Clean gpu
+    del vae
+    torch.cuda.empty_cache()
 
 def train_vae_toy(batch_size = 512,
                 lr = 1e-4,
@@ -163,6 +169,10 @@ def train_vae_toy(batch_size = 512,
     fig = create_scatter_toy(vae, device, model_type='VAE')
     fig.savefig(images_folder / 'scatter.png')
 
+    # Clean gpu
+    del vae
+    torch.cuda.empty_cache()
+
 def train_avae_MNIST(batch_size = 64,
                 z_dim = 32,
                 primal_lr = 1e-3,
@@ -173,10 +183,10 @@ def train_avae_MNIST(batch_size = 64,
                 results_folder = "./results",
                 binary = False,
                 decoder_features = 32,
-                encoder_features = 32):
+                encoder_features = 32,
+                download = True):
 
     # Training setup
-    data_root = './data'
     results_folder = Path(results_folder)
     results_folder.mkdir(parents=True, exist_ok = True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -198,9 +208,9 @@ def train_avae_MNIST(batch_size = 64,
 
     # Get MNIST dataloaders (binary or not)
     if binary:
-        train_dataloader, _ = binary_mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size)
+        train_dataloader, _ = binary_mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size, download=download)
     else:
-        train_dataloader, _ = mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size)
+        train_dataloader, _ = mnist_dataloaders(data_root, batch_size=batch_size, image_size=image_size, download=download)
 
     # Function to zero out gradients
     def zero_grad():
@@ -272,6 +282,10 @@ def train_avae_MNIST(batch_size = 64,
 
     # Save model state dict
     torch.save(avae.state_dict(), results_folder / 'model.pth')
+
+    # Clean gpu
+    del avae
+    torch.cuda.empty_cache()
 
 def train_avae_toy(batch_size = 512,
                 primal_lr = 1e-4,
@@ -347,3 +361,7 @@ def train_avae_toy(batch_size = 512,
     # Create and save scatter plot
     fig = create_scatter_toy(avae, device, model_type='AVAE')
     fig.savefig(images_folder / 'scatter.png')
+
+    # Clean gpu
+    del avae
+    torch.cuda.empty_cache()
