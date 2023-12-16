@@ -30,7 +30,7 @@ if __name__ == "__main__":
     decoder_features_list = [16, 32, 64]
     encoder_features_list = [16, 32, 64]
 
-    for i in range(4):  # Number of setups
+    for i in range(50):  # Number of setups
         print(f'Setup {i + 1}')
         try:
             # Randomly sample hyperparameters for each setup
