@@ -44,7 +44,7 @@ if __name__ == "__main__":
             decoder_features = random.choice(decoder_features_list)
             encoder_features = random.choice(encoder_features_list)
 
-            if i % 2 == 0:  # VAE setups
+            if i % 4 == 0:  # VAE setups
                 train_vae_MNIST(batch_size=batch_size,
                                 z_dim=z_dim,
                                 lr=lr,
