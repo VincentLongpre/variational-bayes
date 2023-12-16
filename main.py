@@ -23,14 +23,13 @@ if __name__ == "__main__":
     z_dims = [16, 32, 64, 100]
     lr_values = [5e-3, 1e-3, 5e-4, 1e-4]
     adv_lr_values = [5e-3, 1e-3, 5e-4, 1e-4]
-    epoch_values = [2, 5, 10, 20, 30]
-    image_sizes = [28, 32]
+    epoch_values = [5, 10, 20]
+    image_sizes = [32]
     channels = 1
     binary_values = [0, 1]
     decoder_features_list = [16, 32, 64]
-    encoder_features_list = [16, 32, 64]
 
-    for i in range(50):  # Number of setups
+    for i in range(1, 50):  # Number of setups
         print(f'Setup {i + 1}')
         try:
             # Randomly sample hyperparameters for each setup
@@ -41,8 +40,7 @@ if __name__ == "__main__":
             epochs = random.choice(epoch_values)
             image_size = random.choice(image_sizes)
             binary = random.choice(binary_values)
-            decoder_features = random.choice(decoder_features_list)
-            encoder_features = random.choice(encoder_features_list)
+            encoder_features = decoder_features = random.choice(decoder_features_list)
 
             if i % 4 == 0:  # VAE setups
                 train_vae_MNIST(batch_size=batch_size,
