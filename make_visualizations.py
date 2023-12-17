@@ -2,6 +2,7 @@ from VariNet.utils.train import train_vae_MNIST, train_avae_MNIST
 from VariNet.models.vae import MnistVAE
 from VariNet.models.avae import MnistAVAE
 from VariNet.utils.datasets import binary_mnist_dataloaders
+from VariNet.utils.visualization import visualize_latent_space
 import json
 import random
 import pandas as pd
@@ -30,4 +31,14 @@ if __name__ == "__main__":
     avae.load_state_dict(torch.load(model_root + 'avae_best/model.pth'))
     avae.to(device)
 
-    
+    vae = MnistVAE(in_channels=input_channels,
+            input_size=image_size,
+            z_dim=z_dim,
+            decoder_features=decoder_features,
+            encoder_features=encoder_features,
+            device=device)
+    vae.to(device)
+
+    visualize_latent_space(vae, test_dataloader, device, result_root)
+    visualize_latent_space(avae, test_dataloader, device, result_root)
+

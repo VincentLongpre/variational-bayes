@@ -3,7 +3,7 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 
-def visualize_latent_space(model, dataloader, device):
+def visualize_latent_space(model, dataloader, device, save_path):
     """
         Represent the latent representation of each class for the given model.
 
@@ -32,9 +32,9 @@ def visualize_latent_space(model, dataloader, device):
 
     plt.scatter(tsne_representations[:, 0], tsne_representations[:, 1], c=labels, cmap='tab10')
     plt.colorbar()
-    plt.show()
+    plt.savefig(save_path)
 
-def create_scatter_toy(model, device, batch_size=1000, model_type='VAE'):
+def create_scatter_toy(model, device, save_path, batch_size=1000, model_type='VAE'):
 
     # Create figure to return
     fig = plt.figure(figsize=(8,8))
@@ -54,5 +54,4 @@ def create_scatter_toy(model, device, batch_size=1000, model_type='VAE'):
 
     plt.xlim(-3, 3); plt.ylim(-3.5, 3.5)
     plt.legend()
-
-    return fig
+    plt.savefig(save_path)
