@@ -3,7 +3,7 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 
-def visualize_latent_space(model, dataloader):
+def visualize_latent_space(model, dataloader, device):
     """
         Represent the latent representation of each class for the given model.
 
