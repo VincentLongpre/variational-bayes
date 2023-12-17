@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
@@ -35,17 +36,19 @@ def visualize_latent_space(model, dataloader, device, save_path):
     plt.savefig(save_path)
 
 def save_images(images, save_path):
-    a = images.shape[0] // 2
-    b = images.shape[0] / a
+    a = int(np.sqrt(images.shape[0]))
+    b = images.shape[0] // a
+    images = images.detach().to('cpu').squeeze()
 
     fig, ax = plt.subplots(a, b, figsize=(a, b))
     for i in range(a):
         for j in range(b):
-            ax[i, j].imshow(images[i*a+j], cmap='gray')
+            ax[i, j].imshow(images[i*b+j], cmap='gray')
             ax[i, j].axis('off')
 
-    plt.subplots_adjust(wspace=0, hspace=0)
-    plt.savefig(save_path)
+    plt.figure(dpi=100)
+    fig.subplots_adjust(wspace=0, hspace=0)
+    fig.savefig(save_path)
 
 def interpolate(model, z_dim, device, save_path):
     z_1 = torch.randn(1, z_dim).to(device)
@@ -66,8 +69,6 @@ def interpolate(model, z_dim, device, save_path):
         else:
             grid = torch.cat((grid, output), 0)
 
-    # Increase dpi to get a better quality image
-    plt.figure(dpi=100)
     save_images(grid, save_path)
 
 def create_scatter_toy(model, device, save_path, batch_size=1000, model_type='VAE'):
