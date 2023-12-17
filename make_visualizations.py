@@ -1,7 +1,7 @@
 from VariNet.models.vae import MnistVAE
 from VariNet.models.avae import MnistAVAE
 from VariNet.utils.datasets import binary_mnist_dataloaders
-from VariNet.utils.visualization import visualize_latent_space, visualize_samples
+from VariNet.utils.visualization import visualize_latent_space, visualize_images
 import json
 import torch
 from pathlib import Path
@@ -45,8 +45,11 @@ if __name__ == "__main__":
     visualize_latent_space(avae, test_dataloader, device, result_root+"avb_latent.png")
 
     # Visualize samples
-    visualize_samples(vae, batch_size, result_root+"vae_samples.png")
-    visualize_samples(avae, batch_size, result_root+"avb_samples.png")
+    vae_samples = vae.sample(batch_size)
+    avae_samples = avae.sample(batch_size)
+    
+    visualize_images(vae_samples, result_root+"vae_samples.png")
+    visualize_images(avae_samples, result_root+"avb_samples.png")
 
     # Visualize interpolations
 

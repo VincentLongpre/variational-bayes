@@ -34,13 +34,14 @@ def visualize_latent_space(model, dataloader, device, save_path):
     plt.colorbar()
     plt.savefig(save_path)
 
-def visualize_samples(model, batch_size, save_path):
-    samples = model.sample(batch_size)
+def visualize_images(images, save_path):
+    a = images.shape[0] // 2
+    b = images.shape[0] / a
 
-    fig, ax = plt.subplots(8, 8, figsize=(8, 8))
-    for i in range(8):
-        for j in range(8):
-            ax[i, j].imshow(samples[i*8+j], cmap='gray')
+    fig, ax = plt.subplots(a, b, figsize=(a, b))
+    for i in range(a):
+        for j in range(b):
+            ax[i, j].imshow(samples[i*a+j], cmap='gray')
             ax[i, j].axis('off')
 
     plt.subplots_adjust(wspace=0, hspace=0)
