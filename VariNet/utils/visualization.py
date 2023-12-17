@@ -31,7 +31,7 @@ def visualize_latent_space(model, dataloader, device, save_path):
     tsne = TSNE(perplexity=20, verbose=1)
     tsne_representations = tsne.fit_transform(latent_representations)
 
-    plt.scatter(tsne_representations[:, 0], tsne_representations[:, 1], c=labels, cmap='tab10')
+    plt.scatter(tsne_representations[:, 0], tsne_representations[:, 1], c=labels, cmap='tab10', alpha=0.7, s=50)
     plt.colorbar()
     plt.savefig(save_path)
 
@@ -40,7 +40,7 @@ def save_images(images, save_path):
     b = images.shape[0] // a
     images = images.detach().to('cpu').squeeze()
 
-    fig, ax = plt.subplots(a, b, figsize=(a, b))
+    fig, ax = plt.subplots(a, b, figsize=(b-0.1, a))
     for i in range(a):
         for j in range(b):
             ax[i, j].imshow(images[i*b+j], cmap='gray')
