@@ -34,18 +34,41 @@ def visualize_latent_space(model, dataloader, device, save_path):
     plt.colorbar()
     plt.savefig(save_path)
 
-def visualize_images(images, save_path):
+def save_images(images, save_path):
     a = images.shape[0] // 2
     b = images.shape[0] / a
 
     fig, ax = plt.subplots(a, b, figsize=(a, b))
     for i in range(a):
         for j in range(b):
-            ax[i, j].imshow(samples[i*a+j], cmap='gray')
+            ax[i, j].imshow(images[i*a+j], cmap='gray')
             ax[i, j].axis('off')
 
     plt.subplots_adjust(wspace=0, hspace=0)
     plt.savefig(save_path)
+
+def interpolate(model, z_dim, device, save_path):
+    z_1 = torch.randn(1, z_dim).to(device)
+    z_2 = torch.randn(1, z_dim).to(device)
+    z_3 = torch.randn(1, z_dim).to(device)
+    z_4 = torch.randn(1, z_dim).to(device)
+
+    lengths = torch.linspace(0., 1., 10).unsqueeze(1).to(z_1.device)
+
+    z_h_top = z_2*lengths + z_1*(1-lengths)
+    z_h_down = z_4*lengths + z_3*(1-lengths)
+
+    for i in range(10):
+        z_ver = z_h_top[i]*lengths + z_h_down[i]*(1-lengths)
+        output = model.decode(z_ver).mode()
+        if i == 0:
+            grid = output
+        else:
+            grid = torch.cat((grid, output), 0)
+
+    # Increase dpi to get a better quality image
+    plt.figure(dpi=100)
+    save_images(grid, save_path)
 
 def create_scatter_toy(model, device, save_path, batch_size=1000, model_type='VAE'):
 
