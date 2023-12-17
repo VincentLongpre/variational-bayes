@@ -2,7 +2,7 @@ from VariNet.utils.train import train_vae_MNIST, train_avae_MNIST
 from VariNet.models.vae import MnistVAE
 from VariNet.models.avae import MnistAVAE
 from VariNet.utils.datasets import binary_mnist_dataloaders
-from VariNet.utils.visualization import visualize_latent_space
+from VariNet.utils.visualization import visualize_latent_space, visualize_samples
 import json
 import random
 import pandas as pd
@@ -40,10 +40,16 @@ if __name__ == "__main__":
             decoder_features=decoder_features,
             encoder_features=encoder_features,
             device=device)
-    avae.load_state_dict(torch.load(model_root + 'vae_comparison/model.pth'))
+    vae.load_state_dict(torch.load(model_root + 'vae_comparison/model.pth'))
     vae.to(device)
 
     # Visualize latent space
     visualize_latent_space(vae, test_dataloader, device, result_root+"vae_latent.png")
-    visualize_latent_space(avae, test_dataloader, device, result_root+"avae_latent.png")
+    visualize_latent_space(avae, test_dataloader, device, result_root+"avb_latent.png")
+
+    # Visualize samples
+    visualize_samples(vae, batch_size, result_root+"vae_samples.png")
+    visualize_samples(avae, batch_size, result_root+"avb_samples.png")
+
+    # Visualize interpolations
 

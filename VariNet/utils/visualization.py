@@ -34,6 +34,18 @@ def visualize_latent_space(model, dataloader, device, save_path):
     plt.colorbar()
     plt.savefig(save_path)
 
+def visualize_samples(model, batch_size, save_path):
+    samples = model.sample(batch_size)
+
+    fig, ax = plt.subplots(8, 8, figsize=(8, 8))
+    for i in range(8):
+        for j in range(8):
+            ax[i, j].imshow(samples[i*8+j], cmap='gray')
+            ax[i, j].axis('off')
+
+    plt.subplots_adjust(wspace=0, hspace=0)
+    plt.savefig(save_path)
+
 def create_scatter_toy(model, device, save_path, batch_size=1000, model_type='VAE'):
 
     # Create figure to return
