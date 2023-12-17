@@ -1,11 +1,8 @@
-from VariNet.utils.train import train_vae_MNIST, train_avae_MNIST
 from VariNet.models.vae import MnistVAE
 from VariNet.models.avae import MnistAVAE
 from VariNet.utils.datasets import binary_mnist_dataloaders
 from VariNet.utils.visualization import visualize_latent_space, visualize_samples
 import json
-import random
-import pandas as pd
 import torch
 from pathlib import Path
 
