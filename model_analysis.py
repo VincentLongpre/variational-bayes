@@ -49,6 +49,11 @@ if __name__ == "__main__":
     scatter(vae_tsne_latent, vae_labels, 't-SNE - VAE', result_root+"tsne_vae.png")
     scatter(avae_tsne_latent, avae_labels, 't-SNE - AVB', result_root+"tsne_avb.png")
 
+    latent_representations = [vae_pca_latent, avae_pca_latent, vae_tsne_latent, avae_tsne_latent]
+    latent_labels = [vae_labels, avae_labels, vae_labels, avae_labels]
+    latent_titles = ['PCA - VAE', 'PCA - AVB', 't-SNE - VAE', 't-SNE - AVB']
+    full_scatter(latent_representations, latent_labels, latent_titles, result_root+"latent_space.png")
+
     # Visualize samples
     vae_samples = vae.sample(batch_size)
     avae_samples = avae.sample(batch_size)

@@ -52,7 +52,29 @@ def scatter(data, labels, title, save_path):
     plt.tight_layout()
 
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+
+
+def full_scatter(representations, labels, titles, save_path):
+    fig, axs = plt.subplots(2, 2, figsize=(10, 10))
+
+    for i in range(4):
+        ind_i, ind_j = i // 2, i % 2
+        axs[ind_i, ind_j].scatter(representations[i][:, 0], representations[i][:, 1], c=labels[i], cmap='tab10', alpha=1, s = 1)
+        axs[ind_i, ind_j].set_title(titles[i])
+
+    #Remove ticks
+    for ax in axs.flat:
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    plt.tight_layout()
+
+    # Colorbar
+    fig.subplots_adjust(right=0.9)
+    cbar_ax = fig.add_axes([0.95, 0.15, 0.02, 0.7])
+    fig.colorbar(axs[0, 0].collections[0], cax=cbar_ax)
+
+    plt.savefig(save_path, dpi=100, bbox_inches='tight')
 
 
 def save_images(images, save_path):
