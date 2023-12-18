@@ -19,7 +19,6 @@ def latent_dim_reduction(model, dataloader, device):
     with torch.no_grad():
         for batch in dataloader:
             imgs, labels = batch
-            batch_size = imgs.shape[0]
             x = imgs.to(device)
 
             posterior = model.encode(x)
@@ -36,10 +35,8 @@ def latent_dim_reduction(model, dataloader, device):
     pca = PCA(n_components=2)
     pca_representations= pca.fit_transform(latent_representations)
 
-    # plt.scatter(tsne_representations[:, 0], tsne_representations[:, 1], c=labels, cmap='tab10', alpha=0.7, s=50)
-    # plt.colorbar()
-    # plt.savefig(save_path)
     return tsne_representations, pca_representations, labels
+
 
 def scatter(data, labels, title, save_path):
     # Scatter PCA - VAE
@@ -57,6 +54,7 @@ def scatter(data, labels, title, save_path):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
+
 def save_images(images, save_path):
     a = int(np.sqrt(images.shape[0]))
     b = images.shape[0] // a
@@ -70,6 +68,7 @@ def save_images(images, save_path):
 
     fig.subplots_adjust(wspace=0, hspace=0)
     fig.savefig(save_path, dpi=200)
+
 
 def interpolate(model, z_dim, device, save_path):
     z_1 = torch.randn(1, z_dim).to(device)
@@ -92,8 +91,60 @@ def interpolate(model, z_dim, device, save_path):
 
     save_images(grid, save_path)
 
-def create_scatter_toy(model, device, save_path, batch_size=1000, model_type='VAE'):
 
+def create_reconstructions(vae, avae, test_dataloader, device, save_path, n=5):
+    vae.eval()
+    with torch.no_grad():
+        batch = next(iter(test_dataloader))
+        imgs, _ = batch
+        x = imgs.to(device)
+
+        posterior = vae.encode(x)
+        z = posterior.mode()
+        x_hat_vae = vae.decode(z).mode()
+
+        x_hat_vae = x_hat_vae.cpu()
+
+    avae.eval()
+    with torch.no_grad():
+        x = imgs.to(device)
+
+        z, _, _ = avae.encode(x)
+        x_hat_avae = avae.decode(z).mode()
+
+        x = x.cpu()
+        x_hat_avae = x_hat_avae.cpu()
+    
+    fig, axs = plt.subplots(6, n//2, figsize=(n//2, 6))
+
+    for i in range(n):
+        if i%2 == 0:
+            axs[2, i//2].imshow(x[i].squeeze(), cmap='gray')
+            axs[0, i//2].imshow(x_hat_vae[i].squeeze(), cmap='gray')
+            axs[4, i//2].imshow(x_hat_avae[i].squeeze(), cmap='gray')
+        else:
+            axs[3, i//2].imshow(x[i].squeeze(), cmap='gray')
+            axs[1, i//2].imshow(x_hat_vae[i].squeeze(), cmap='gray')
+            axs[5, i//2].imshow(x_hat_avae[i].squeeze(), cmap='gray')
+
+    # Remove ticks
+    for ax in axs.flat:
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    # Remve horizontal space between axes
+    fig.subplots_adjust(hspace=0, wspace=0)
+
+    axs[0, 0].set_ylabel('VAE')
+    axs[2, 0].set_ylabel('Original')
+    axs[4, 0].set_ylabel('AVB')
+
+    plt.suptitle("Reconstructions - VAE and AVB")
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+
+
+def create_scatter_toy(model, device, save_path, batch_size=1000, model_type='VAE'):
     # Create figure to return
     fig = plt.figure(figsize=(8,8))
 

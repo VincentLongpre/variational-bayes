@@ -60,3 +60,6 @@ if __name__ == "__main__":
     interpolate(vae, z_dim, device, result_root+"vae_interpolate.png")
     interpolate(avae, z_dim, device, result_root+"avb_interpolate.png")
 
+    # Create reconstructions
+    create_reconstructions(vae, avae, test_dataloader, device, result_root+"reconstructions.png")
+
