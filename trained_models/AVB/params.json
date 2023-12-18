@@ -1,0 +1,1 @@
+{"model_type": "AVAE", "batch_size": 32, "z_dim": 4, "primal_lr": 0.001, "adv_lr": 0.0005, "epochs": 2, "image_size": 32, "input_channels": 1, "binary": 1, "decoder_features": 16, "encoder_features": 16, "train_losses": [977.8234252929688, 974.7823486328125], "recon_error": [0.05596371740102768, 0.048187676817178726]}
