@@ -1,17 +1,17 @@
 from VariNet.models.vae import MnistVAE
 from VariNet.models.avae import MnistAVAE
 from VariNet.utils.datasets import binary_mnist_dataloaders
-from VariNet.utils.visualization import visualize_latent_space, save_images, interpolate
+from VariNet.utils.visualization import *
 import json
 import torch
 from pathlib import Path
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 data_root = "./data"
-result_root = "./VariNet/plots"
-model_root = "./VariNet/trained_models/"
+result_root = "./figures"
+model_root = "./trained_models"
 
-with open(model_root + 'avae_best/params.json', 'r') as json_file:
+with open(model_root + '/AVB/params.json', 'r') as json_file:
     params = json.load(json_file)
 
 locals().update(params)
@@ -28,7 +28,7 @@ if __name__ == "__main__":
                     decoder_features=decoder_features,
                     encoder_features=encoder_features,
                     device=device)
-    avae.load_state_dict(torch.load(model_root + 'avae_best/model.pth'))
+    avae.load_state_dict(torch.load(model_root + '/AVB/model.pth'))
     avae.to(device)
 
     vae = MnistVAE(in_channels=input_channels,
@@ -37,12 +37,17 @@ if __name__ == "__main__":
             decoder_features=decoder_features,
             encoder_features=encoder_features,
             device=device)
-    vae.load_state_dict(torch.load(model_root + 'vae_comparison/model.pth'))
+    vae.load_state_dict(torch.load(model_root + '/VAE/model.pth'))
     vae.to(device)
 
     # Visualize latent space
-    visualize_latent_space(vae, test_dataloader, device, result_root+"vae_latent.png")
-    visualize_latent_space(avae, test_dataloader, device, result_root+"avb_latent.png")
+    vae_tsne_latent, vae_pca_latent, vae_labels = latent_dim_reduction(vae, test_dataloader, device)
+    avae_tsne_latent, avae_pca_latent, avae_labels = latent_dim_reduction(avae, test_dataloader, device)
+
+    scatter(vae_pca_latent, vae_labels, 'PCA - VAE', result_root+"pca_vae.png")
+    scatter(avae_pca_latent, avae_labels, 'PCA - AVB', result_root+"pca_avb.png")
+    scatter(vae_tsne_latent, vae_labels, 't-SNE - VAE', result_root+"tsne_vae.png")
+    scatter(avae_tsne_latent, avae_labels, 't-SNE - AVB', result_root+"tsne_avb.png")
 
     # Visualize samples
     vae_samples = vae.sample(batch_size)

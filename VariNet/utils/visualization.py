@@ -1,10 +1,11 @@
 import torch
 import numpy as np
 from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 
-def visualize_latent_space(model, dataloader, device, save_path):
+def latent_dim_reduction(model, dataloader, device):
     """
         Represent the latent representation of each class for the given model.
 
@@ -28,12 +29,33 @@ def visualize_latent_space(model, dataloader, device, save_path):
 
     latent_representations = torch.cat(latent_representations_list, dim=0)
     labels = torch.tensor(labels_list)
+
     tsne = TSNE(perplexity=20, verbose=1)
     tsne_representations = tsne.fit_transform(latent_representations)
 
-    plt.scatter(tsne_representations[:, 0], tsne_representations[:, 1], c=labels, cmap='tab10', alpha=0.7, s=50)
+    pca = PCA(n_components=2)
+    pca_representations= pca.fit_transform(latent_representations)
+
+    # plt.scatter(tsne_representations[:, 0], tsne_representations[:, 1], c=labels, cmap='tab10', alpha=0.7, s=50)
+    # plt.colorbar()
+    # plt.savefig(save_path)
+    return tsne_representations, pca_representations, labels
+
+def scatter(data, labels, title, save_path):
+    # Scatter PCA - VAE
+    fig = plt.figure(figsize=(7, 6))
+
+    plt.scatter(data[:, 0], data[:, 1], c=labels, cmap='tab10', alpha=1, s = 1)
     plt.colorbar()
-    plt.savefig(save_path)
+    plt.title(title)
+
+    #Remove ticks
+    plt.xticks([])
+    plt.yticks([])
+    plt.tight_layout()
+
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
 
 def save_images(images, save_path):
     a = int(np.sqrt(images.shape[0]))
@@ -46,9 +68,8 @@ def save_images(images, save_path):
             ax[i, j].imshow(images[i*b+j], cmap='gray')
             ax[i, j].axis('off')
 
-    plt.figure(dpi=100)
     fig.subplots_adjust(wspace=0, hspace=0)
-    fig.savefig(save_path)
+    fig.savefig(save_path, dpi=200)
 
 def interpolate(model, z_dim, device, save_path):
     z_1 = torch.randn(1, z_dim).to(device)
