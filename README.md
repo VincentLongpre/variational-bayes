@@ -20,13 +20,18 @@ For this project, we will train these models on the datasets used in the origina
 ### 4Frames
 The 4Frames is a simple synthetic dataset composed of the four 2x2 binary matrices shown below
 
-![4Frames Training Examples](/figures/4Frames_dataset.png)
+<div align="center">
+    <img src="/figures/4Frames_dataset.png" alt="$Frames Example">
+</div>
+
 
 ### Binarized MNIST
 
 The MNIST is composed of 70,000 images of handwritten digits and is frequently used to train computer vision and generative models. For this implementation, we convert the grayscale pixel values into a binary format by setting pixels above a set threshold of 127 to 1 and the rest to 0.
 
-![4Frames Training Examples](/figures/mnist_dataset.png)
+<div align="center">
+    <img src="/figures/mnist_dataset.png" alt="$MNIST Example">
+</div>
 
 ## Code 🖥️
 
