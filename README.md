@@ -1,14 +1,12 @@
 # Exploring the latent space of Variational Models
 
-By [Gabriel Missael Barco](https://github.com/GabrielMissael), Michael Matesic, Parker Levesque, and Vincent Longpre.
+By [Gabriel Missael Barco](https://github.com/GabrielMissael), Michael Matesic, Parker Levesque, and [Vincent Longpre](https://github.com/VincentLongpre).
 
 Final project, IFT 6269 : Probabilistic Graphical Models - Fall 2023, Prof. [Simon Lacoste-Julien](https://www.iro.umontreal.ca/~slacoste/). *Université de Montréal*
 
-
-**Work in progress...** ⌛
-
 ## Abstract 📄
-
+The Adversarial Variational Bayes (AVB) method is a modification of the Variational Autoencoder (VAE) generative model, combining elements from Generative Adversarial Networks (GANs) to improve upon the quality of the generated samples from the model. The neural network is used as a black-box approximate inference model, allowing an arbitrarily expressive modelling of the true posterior distribution. We explore this connection between VAEs and GANs by training both a regular VAE and an AVB model on two datasets of differing complexity.
+ 
 ## Models 🧠
 
 ### Variational Autoencoder (VAE) 🤖
@@ -16,6 +14,15 @@ Final project, IFT 6269 : Probabilistic Graphical Models - Fall 2023, Prof. [Sim
 ### Adversarial Variational Bayes (AVAE) 🧠
 
 ## Datasets 📊
+
+For this project, we will train these models on the datasets used in the original AVB paper namely 4Frames and binarized MNIST. 
+
+### 4Frames
+The 4Frames is a simple synthetic dataset composed of the four 2x2 binary matrices shown below
+
+![4Frames Training Examples](relative/path/in/repository/to/image.svg)
+
+### Binarized MNIST
 
 ## Code 🖥️
 
