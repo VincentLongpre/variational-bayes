@@ -11,7 +11,11 @@ The Adversarial Variational Bayes (AVB) method is a modification of the Variatio
 
 ### Variational Autoencoder (VAE) 🤖
 
-### Adversarial Variational Bayes (AVAE) 🧠
+The core concept of VAE is to merge factor analysis's idea of uncovering underlying features with the power of neural network. Using amortized variational inference and the reparametrization trick, this model allows for efficient and scalable learning of complex data distributions.
+
+### Adversarial Variational Bayes (AVB) 🧠
+
+This model introduces adversarial training in the context of variational inference, enhancing the richness and fidelity of generated samples while maintaining the probabilistic framework of VAEs. Adversarial training within this framework aims to minimize the discrepancy between the learned approximate posterior and the true data distribution replacing the KL divergence used in the ELBO loss of VAE.
 
 ## Datasets 📊
 
