@@ -54,7 +54,7 @@ Project structure (directories):
 
 ## Experiments & Results 📈
 
-## Conclusions 📝
+For both datasets, we performed parameter selection and trained comparable architectures for both VAE and AVB models. The findings indicte that AVB seems to allow for more flexibility in samples and reconstructions but for generates less convincing samples due to the greater diversity. Moreover, the difference in the learned latence space is much clearer for dataset with simple structure like 4Frames but becomes hard to visualize once the complexity of the data increases. Also, the adversarial approach also caused the training process to be less stable and more sensitive to parameter selection.
 
 ## References
 1. Kingma, D. P. & Welling, M. (2014). Auto-Encoding Variational Bayes. 2nd International Conference on Learning Representations, ICLR 2014, Banff, AB, Canada, April 14-16, 2014, Conference Track Proceedings.
